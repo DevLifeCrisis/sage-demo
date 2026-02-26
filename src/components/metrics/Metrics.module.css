@@ -1,0 +1,88 @@
+.kpiIcon {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 32px;
+  opacity: 0.1;
+}
+
+.kpiLabel {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+.kpiTrend {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.chartTitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 20px;
+}
+
+/* Bar chart */
+.barChartContainer {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.gridLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.barGroup {
+  display: flex;
+  align-items: flex-end;
+  gap: 32px;
+  z-index: 1;
+}
+
+.barItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bar {
+  background: linear-gradient(180deg, #00E5FF 0%, rgba(0, 229, 255, 0.4) 100%);
+  border-radius: 6px 6px 0 0;
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.2);
+}
+
+.barValue {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.barLabel {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 10px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Line chart */
+.lineChartSvg {
+  width: 100%;
+  height: auto;
+}

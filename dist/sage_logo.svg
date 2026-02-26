@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <!-- USWDS Primary Gradient -->
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#005ea2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a4480;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Accent Gradient -->
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00bde3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#005ea2;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Subtle Glow Filter -->
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Drop Shadow -->
+    <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#005ea2" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Shield Base -->
+  <path d="M60 10 L20 25 L20 50 C20 85 40 105 60 110 C80 105 100 85 100 50 L100 25 Z" 
+        fill="url(#primaryGradient)" 
+        filter="url(#dropShadow)" 
+        stroke="none"/>
+  
+  <!-- Inner Shield Highlight -->
+  <path d="M60 15 L25 28 L25 50 C25 80 42 98 60 102 C78 98 95 80 95 50 L95 28 Z" 
+        fill="none" 
+        stroke="rgba(255,255,255,0.2)" 
+        stroke-width="1"/>
+
+  <!-- Neural Network Nodes -->
+  <!-- Center Node (SAGE Core) -->
+  <circle cx="60" cy="45" r="8" fill="url(#accentGradient)" filter="url(#softGlow)"/>
+  <circle cx="60" cy="45" r="4" fill="#ffffff" opacity="0.9"/>
+  
+  <!-- Government Systems Nodes -->
+  <circle cx="40" cy="35" r="5" fill="url(#accentGradient)"/>
+  <circle cx="40" cy="35" r="2.5" fill="#ffffff" opacity="0.8"/>
+  
+  <circle cx="80" cy="35" r="5" fill="url(#accentGradient)"/>
+  <circle cx="80" cy="35" r="2.5" fill="#ffffff" opacity="0.8"/>
+  
+  <circle cx="35" cy="55" r="4" fill="url(#accentGradient)"/>
+  <circle cx="35" cy="55" r="2" fill="#ffffff" opacity="0.8"/>
+  
+  <circle cx="85" cy="55" r="4" fill="url(#accentGradient)"/>
+  <circle cx="85" cy="55" r="2" fill="#ffffff" opacity="0.8"/>
+  
+  <!-- Process Nodes -->
+  <circle cx="50" cy="65" r="4" fill="url(#accentGradient)"/>
+  <circle cx="50" cy="65" r="2" fill="#ffffff" opacity="0.8"/>
+  
+  <circle cx="70" cy="65" r="4" fill="url(#accentGradient)"/>
+  <circle cx="70" cy="65" r="2" fill="#ffffff" opacity="0.8"/>
+
+  <!-- Connection Lines (Neural Network) -->
+  <g stroke="#ffffff" stroke-width="2" stroke-opacity="0.7" fill="none">
+    <!-- Central Hub Connections -->
+    <line x1="60" y1="45" x2="40" y2="35"/>
+    <line x1="60" y1="45" x2="80" y2="35"/>
+    <line x1="60" y1="45" x2="35" y2="55"/>
+    <line x1="60" y1="45" x2="85" y2="55"/>
+    <line x1="60" y1="45" x2="50" y2="65"/>
+    <line x1="60" y1="45" x2="70" y2="65"/>
+    
+    <!-- Inter-node connections -->
+    <line x1="40" y1="35" x2="35" y2="55" stroke-opacity="0.4"/>
+    <line x1="80" y1="35" x2="85" y2="55" stroke-opacity="0.4"/>
+    <line x1="50" y1="65" x2="70" y2="65" stroke-opacity="0.4"/>
+  </g>
+
+  <!-- Data Flow Indicators (subtle animation paths) -->
+  <g fill="none" stroke="url(#accentGradient)" stroke-width="1.5" opacity="0.6">
+    <!-- Curved data flow paths -->
+    <path d="M 30 40 Q 45 30 60 40" stroke-dasharray="4,3"/>
+    <path d="M 90 40 Q 75 30 60 40" stroke-dasharray="4,3"/>
+    <path d="M 40 70 Q 50 75 60 70" stroke-dasharray="4,3"/>
+  </g>
+
+  <!-- Government Eagle Silhouette (subtle) -->
+  <g fill="rgba(255,255,255,0.15)" transform="translate(60,75) scale(0.15)">
+    <path d="M0-20 C-15-15 -20-5 -20 5 C-15 10 -5 8 0 5 C5 8 15 10 20 5 C20-5 15-15 0-20 Z M-10-5 C-12-5 -14-7 -14-9 C-14-11 -12-13 -10-13 C-8-13 -6-11 -6-9 C-6-7 -8-5 -10-5 Z M10-5 C12-5 14-7 14-9 C14-11 12-13 10-13 C8-13 6-11 6-9 C6-7 8-5 10-5 Z"/>
+  </g>
+
+  <!-- Typography Integration -->
+  <text x="60" y="95" 
+        font-family="system-ui, -apple-system, sans-serif" 
+        font-size="12" 
+        font-weight="700" 
+        text-anchor="middle" 
+        fill="#005ea2" 
+        opacity="0.8">
+    SAGE
+  </text>
+  
+  <!-- Tagline -->
+  <text x="60" y="107" 
+        font-family="system-ui, -apple-system, sans-serif" 
+        font-size="6" 
+        font-weight="400" 
+        text-anchor="middle" 
+        fill="#1a4480" 
+        opacity="0.7">
+    Smart Agent for Government Enterprise
+  </text>
+
+</svg>

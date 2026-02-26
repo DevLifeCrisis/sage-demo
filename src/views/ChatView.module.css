@@ -1,0 +1,221 @@
+.chatView {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.chatArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  position: relative;
+}
+
+/* ===== Record Panel (Desktop) ===== */
+.contextPanelDesktop {
+  height: 100%;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.recordPanel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 14, 23, 0.5);
+  backdrop-filter: blur(20px);
+  overflow-y: auto;
+  min-width: 340px;
+}
+
+.recordPanel::-webkit-scrollbar {
+  width: 3px;
+}
+
+.recordPanel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+}
+
+.recordPanelHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.recordPanelIcon {
+  font-size: 18px;
+}
+
+.recordPanelTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #00E5FF;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  flex: 1;
+}
+
+.recordCount {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0A0A0F;
+  background: #00E5FF;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recordList {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recordCard {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.2s;
+}
+
+.recordCard:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(0, 229, 255, 0.2);
+}
+
+.recordCardTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.recordIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.recordInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.recordNumber {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: #00E5FF;
+}
+
+.recordType {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.recordStatus {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 10px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.statusCreated {
+  background: rgba(0, 229, 255, 0.12);
+  color: #00E5FF;
+}
+
+.statusUpdated {
+  background: rgba(255, 171, 0, 0.12);
+  color: #FFAB00;
+}
+
+.statusResolved {
+  background: rgba(0, 230, 118, 0.12);
+  color: #00E676;
+}
+
+.statusCancelled {
+  background: rgba(255, 82, 82, 0.12);
+  color: #FF5252;
+}
+
+.statusReferenced {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.recordMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.25);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ===== Mobile drawer ===== */
+.contextDrawerOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 100;
+}
+
+.contextDrawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 85%;
+  max-width: 400px;
+  z-index: 101;
+  overflow-y: auto;
+}
+
+.contextToggle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  background: rgba(0, 229, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  border-radius: 8px;
+  color: #00E5FF;
+  padding: 6px 12px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  gap: 4px;
+}
+
+@media (max-width: 768px) {
+  .contextPanelDesktop {
+    display: none;
+  }
+  .contextToggle {
+    display: flex;
+  }
+}
