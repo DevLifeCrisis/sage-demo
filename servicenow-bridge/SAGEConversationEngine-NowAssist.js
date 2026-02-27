@@ -77,14 +77,15 @@ SAGEConversationEngine.prototype = {
         if (propValue === 'false') {
             return false;
         }
-        // Check if the GenAI API is actually available
+        // Check if the Global helper is available
         try {
-            if (typeof sn_generative_ai === 'undefined' || !sn_generative_ai.GenAiController) {
-                gs.warn('SAGEConversationEngine: sn_generative_ai.GenAiController not available, falling back to pattern matching');
+            var helper = new global.SAGEGenAIHelper();
+            if (!helper.isAvailable()) {
+                gs.warn('SAGEConversationEngine: GenAI not available via SAGEGenAIHelper, falling back to pattern matching');
                 return false;
             }
         } catch (e) {
-            gs.warn('SAGEConversationEngine: Error checking GenAI availability: ' + e.message);
+            gs.warn('SAGEConversationEngine: SAGEGenAIHelper not found: ' + e.message + ', falling back to pattern matching');
             return false;
         }
         return true;
@@ -107,30 +108,13 @@ SAGEConversationEngine.prototype = {
      */
     _classifyIntentWithAI: function(message) {
         try {
-            var controller = new sn_generative_ai.GenAiController();
-            var input = new sn_generative_ai.GenAiInput();
-
-            var classificationPrompt = 'Classify the following user message into exactly one category: onboarding, offboarding, it_resolution, general.\n'
-                + 'Only respond with the category name in lowercase, nothing else.\n\n'
-                + 'Category definitions:\n'
-                + '- onboarding: new hire setup, equipment requests, first day preparation, employee joining\n'
-                + '- offboarding: employee departure, exit processing, access removal, asset returns, resignation\n'
-                + '- it_resolution: technical issues, VPN, password, network, software, hardware problems\n'
-                + '- general: greetings, help requests, or anything that does not fit the above\n\n'
-                + 'User message: ' + message;
-
-            input.setPrompt(classificationPrompt);
-            input.setSystemMessage('You are an intent classifier for a government employee self-service portal called SAGE. Respond with exactly one word: the category name.');
-
+            var helper = new global.SAGEGenAIHelper();
             var modelId = this._getAIModelId();
-            if (modelId) {
-                input.setModelId(modelId);
-            }
 
             gs.debug('SAGEConversationEngine [AI]: Intent classification request for message: ' + message.substring(0, 100));
 
-            var output = controller.generate(input);
-            var responseText = (output.getContent() || '').trim().toLowerCase();
+            var rawResponse = helper.classify(message, modelId);
+            var responseText = (rawResponse || '').trim().toLowerCase();
 
             gs.debug('SAGEConversationEngine [AI]: Intent classification response: ' + responseText);
 
@@ -150,16 +134,7 @@ SAGEConversationEngine.prototype = {
                 return null;
             }
 
-            // Try to get confidence if available
             var confidence = 0.9; // Default high confidence for AI classification
-            try {
-                var aiConfidence = output.getConfidence();
-                if (aiConfidence && !isNaN(parseFloat(aiConfidence))) {
-                    confidence = parseFloat(aiConfidence);
-                }
-            } catch (confErr) {
-                // getConfidence() may not be available on all implementations
-            }
 
             return {
                 intent: responseText,
@@ -187,8 +162,8 @@ SAGEConversationEngine.prototype = {
         }
 
         try {
-            var controller = new sn_generative_ai.GenAiController();
-            var input = new sn_generative_ai.GenAiInput();
+            var helper = new global.SAGEGenAIHelper();
+            var modelId = this._getAIModelId();
 
             // Build system message with flow context
             var systemParts = [];
@@ -233,7 +208,7 @@ SAGEConversationEngine.prototype = {
             systemParts.push('Keep your response concise (1-3 sentences). Do not fabricate data or make promises about timelines.');
             systemParts.push('If this step has a specific question, make sure to ask it clearly.');
 
-            input.setSystemMessage(systemParts.join('\n'));
+            var systemMessage = systemParts.join('\n');
 
             // Build the prompt
             var prompt = 'Generate a natural, helpful response for the current step of the ' + intent + ' flow.';
@@ -244,17 +219,10 @@ SAGEConversationEngine.prototype = {
                 prompt = prompt + '\n\nThe core question to convey is: "' + stepDef.message + '"';
             }
 
-            input.setPrompt(prompt);
-
-            var modelId = this._getAIModelId();
-            if (modelId) {
-                input.setModelId(modelId);
-            }
-
             gs.debug('SAGEConversationEngine [AI]: Response generation request for intent=' + intent + ' step=' + context.currentStep);
 
-            var output = controller.generate(input);
-            var responseText = (output.getContent() || '').trim();
+            var responseText = helper.generate(systemMessage, prompt, modelId);
+            responseText = (responseText || '').trim();
 
             gs.debug('SAGEConversationEngine [AI]: Generated response: ' + responseText.substring(0, 200));
 
