@@ -382,6 +382,60 @@ SAGEConversationEngine.prototype = {
         var turnCount = parseInt(conv.getValue('turn_count') || '0', 10) + 1;
         this._logMessage(conversationId, 'inbound', 'Selected: ' + choice, 'text', turnCount);
 
+        // Handle special flow-control choices
+        if (choice === 'start_over') {
+            // Reset conversation state
+            context.collectedData = {};
+            context.completedSteps = [];
+            context.currentStep = 0;
+            context.flowStarted = false;
+            context.activeRecords = [];
+            context.state = 'active';
+            context.outcome = null;
+            conv.setValue('intent', '');
+            conv.setValue('turn_count', turnCount);
+            conv.setValue('context_data', JSON.stringify(context));
+            conv.setValue('state', 'active');
+            conv.setValue('outcome', '');
+            conv.update();
+
+            var menuResponse = {
+                message: "Hello! I'm SAGE, your Smart Automated Government Employee assistant. How can I help you today?",
+                choices: [
+                    { label: '👤 New Hire Onboarding', value: 'onboarding' },
+                    { label: '🚪 Employee Offboarding', value: 'offboarding' },
+                    { label: '🔧 IT Issue Resolution', value: 'it_resolution' }
+                ],
+                actionCard: null,
+                flow: { intent: 'general', currentStep: 0, totalSteps: 0, completedSteps: [] },
+                collectedData: {},
+                activeRecords: []
+            };
+            this._logMessage(conversationId, 'outbound', menuResponse.message, 'text', turnCount);
+            return menuResponse;
+        }
+
+        if (choice === 'end_conversation') {
+            context.state = 'completed';
+            conv.setValue('turn_count', turnCount);
+            conv.setValue('context_data', JSON.stringify(context));
+            conv.setValue('state', 'completed');
+            conv.update();
+
+            var endResponse = {
+                message: "Thank you for using SAGE! Have a great day. 👋",
+                choices: [
+                    { label: 'Start a new request', value: 'start_over' }
+                ],
+                actionCard: null,
+                flow: { intent: currentIntent || 'general', currentStep: 0, totalSteps: 0, completedSteps: [] },
+                collectedData: {},
+                activeRecords: []
+            };
+            this._logMessage(conversationId, 'outbound', endResponse.message, 'text', turnCount);
+            return endResponse;
+        }
+
         // If no intent yet, the choice IS the intent selection
         if (!currentIntent || currentIntent === 'unknown' || currentIntent === 'general') {
             var intentMap = {
