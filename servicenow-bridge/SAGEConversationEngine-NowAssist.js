@@ -36,7 +36,7 @@
  * 
  * REQUIRED PLUGINS:
  *    - Glide Conversation Generative AI (com.glide.conversation.genai or similar)
- *    - sn_gen_ai scope must be available
+ *    - sn_generative_ai scope must be available
  * 
  * DEPENDENCIES:
  * - SAGEActionHandler Script Include (Phil's code)
@@ -70,7 +70,7 @@ SAGEConversationEngine.prototype = {
 
     /**
      * [NOW ASSIST] Check if AI is enabled via system property.
-     * Returns false if property is explicitly 'false' or if sn_gen_ai is unavailable.
+     * Returns false if property is explicitly 'false' or if sn_generative_ai is unavailable.
      */
     _isAIEnabled: function() {
         var propValue = gs.getProperty('sage.ai.enabled', 'true');
@@ -79,8 +79,8 @@ SAGEConversationEngine.prototype = {
         }
         // Check if the GenAI API is actually available
         try {
-            if (typeof sn_gen_ai === 'undefined' || !sn_gen_ai.GenAiController) {
-                gs.warn('SAGEConversationEngine: sn_gen_ai.GenAiController not available, falling back to pattern matching');
+            if (typeof sn_generative_ai === 'undefined' || !sn_generative_ai.GenAiController) {
+                gs.warn('SAGEConversationEngine: sn_generative_ai.GenAiController not available, falling back to pattern matching');
                 return false;
             }
         } catch (e) {
@@ -107,8 +107,8 @@ SAGEConversationEngine.prototype = {
      */
     _classifyIntentWithAI: function(message) {
         try {
-            var controller = new sn_gen_ai.GenAiController();
-            var input = new sn_gen_ai.GenAiInput();
+            var controller = new sn_generative_ai.GenAiController();
+            var input = new sn_generative_ai.GenAiInput();
 
             var classificationPrompt = 'Classify the following user message into exactly one category: onboarding, offboarding, it_resolution, general.\n'
                 + 'Only respond with the category name in lowercase, nothing else.\n\n'
@@ -187,8 +187,8 @@ SAGEConversationEngine.prototype = {
         }
 
         try {
-            var controller = new sn_gen_ai.GenAiController();
-            var input = new sn_gen_ai.GenAiInput();
+            var controller = new sn_generative_ai.GenAiController();
+            var input = new sn_generative_ai.GenAiInput();
 
             // Build system message with flow context
             var systemParts = [];
