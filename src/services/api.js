@@ -273,7 +273,32 @@ export async function confirmAction(conversationId, confirmed) {
   return sendAction(conversationId, "pending", confirmed);
 }
 
-// Aliases for backward compatibility with views
-export const fetchDashboardData = getDashboardData;
-export const fetchAuditData = getAuditData;
-export const fetchMetricsData = getMetricsData;
+// =============================================================================
+// TRANSFORMED DATA FETCHERS (used by views)
+// =============================================================================
+
+import { transformDashboardData, transformMetricsData, transformAuditData } from './dataAdapter.js';
+
+/**
+ * Fetch dashboard data and transform to DashboardView shape.
+ */
+export async function fetchDashboardData() {
+  const raw = await getDashboardData();
+  return transformDashboardData(raw);
+}
+
+/**
+ * Fetch audit data and transform to AuditView shape.
+ */
+export async function fetchAuditData() {
+  const raw = await getAuditData();
+  return transformAuditData(raw);
+}
+
+/**
+ * Fetch metrics data and transform to MetricsView shape.
+ */
+export async function fetchMetricsData() {
+  const raw = await getMetricsData();
+  return transformMetricsData(raw);
+}
