@@ -20,9 +20,10 @@
  */
 
 // --- Configuration ---
-const INSTANCE_URL = process.env.REACT_APP_SN_INSTANCE_URL || '';
+// Vite uses import.meta.env.VITE_* (not process.env.REACT_APP_*)
+const INSTANCE_URL = import.meta.env.VITE_SN_INSTANCE_URL || '';
 const BASE_URL = INSTANCE_URL + '/api/x_ecsf_gov_forum/sage';
-const AUTH_TOKEN = process.env.REACT_APP_SN_AUTH_TOKEN || '';
+const AUTH_TOKEN = import.meta.env.VITE_SN_AUTH_TOKEN || '';
 
 /**
  * Internal fetch wrapper with auth and error handling.
