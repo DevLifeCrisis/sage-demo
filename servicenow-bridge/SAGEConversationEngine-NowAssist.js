@@ -881,6 +881,7 @@ SAGEConversationEngine.prototype = {
                     context.activeRecords.push({
                         type: 'sn_hr_core_case',
                         id: hrCase.sys_id || '',
+                        number: hrCase.number || '',
                         label: 'HR Case'
                     });
                 }
@@ -920,6 +921,7 @@ SAGEConversationEngine.prototype = {
                     context.activeRecords.push({
                         type: 'sn_hr_core_case',
                         id: offboardCase.sys_id || '',
+                        number: offboardCase.number || '',
                         label: 'Offboarding Case'
                     });
                 }
