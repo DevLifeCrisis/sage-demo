@@ -24,8 +24,61 @@ function StatusIcon({ status }) {
   );
 }
 
+/**
+ * Build displayable items from the action card.
+ * Supports both legacy format (items array) and ServiceNow format (description string / data object).
+ */
+function getItems(actionCard) {
+  // Legacy format — already has items array
+  if (actionCard.items && Array.isArray(actionCard.items)) {
+    return actionCard.items;
+  }
+
+  // ServiceNow format — build items from description or data
+  const items = [];
+
+  if (actionCard.description) {
+    // Parse "Key: Value" lines from description
+    const lines = actionCard.description.split('\n').filter(l => l.trim());
+    lines.forEach(line => {
+      const colonIdx = line.indexOf(':');
+      if (colonIdx > 0) {
+        items.push({
+          label: line.substring(0, colonIdx).trim(),
+          detail: line.substring(colonIdx + 1).trim(),
+          status: 'pending',
+        });
+      } else {
+        items.push({ label: line.trim(), detail: '', status: 'pending' });
+      }
+    });
+  } else if (actionCard.data && typeof actionCard.data === 'object') {
+    // Fall back to raw data keys
+    Object.entries(actionCard.data).forEach(([key, value]) => {
+      items.push({
+        label: key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+        detail: String(value),
+        status: 'pending',
+      });
+    });
+  }
+
+  return items;
+}
+
+function hasAwaitingItems(actionCard) {
+  if (actionCard.items && Array.isArray(actionCard.items)) {
+    return actionCard.items.some(it => it.status === 'pending');
+  }
+  // ServiceNow confirmation cards are always awaiting
+  return actionCard.type === 'confirmation';
+}
+
 export default function ActionCard({ actionCard, onConfirm, onCancel, awaitingConfirmation }) {
   if (!actionCard) return null;
+
+  const items = getItems(actionCard);
+  const showButtons = awaitingConfirmation || hasAwaitingItems(actionCard);
 
   return (
     <motion.div
@@ -37,9 +90,9 @@ export default function ActionCard({ actionCard, onConfirm, onCancel, awaitingCo
       <div className={styles.actionTitle}>{actionCard.title}</div>
       <div>
         <AnimatePresence>
-          {actionCard.items.map((item, i) => (
+          {items.map((item, i) => (
             <motion.div
-              key={item.label}
+              key={item.label + i}
               className={styles.actionItem}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
@@ -54,7 +107,7 @@ export default function ActionCard({ actionCard, onConfirm, onCancel, awaitingCo
           ))}
         </AnimatePresence>
       </div>
-      {awaitingConfirmation && (
+      {showButtons && (
         <motion.div
           className={styles.actionButtons}
           initial={{ opacity: 0 }}

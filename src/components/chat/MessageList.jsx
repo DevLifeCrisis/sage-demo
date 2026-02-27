@@ -38,7 +38,8 @@ export default function MessageList({
               onCancel={onCancelAction}
               awaitingConfirmation={
                 i === messages.length - 1 &&
-                msg.actionCard.items.some((it) => it.status === 'pending')
+                (msg.actionCard.type === 'confirmation' ||
+                  (msg.actionCard.items && msg.actionCard.items.some((it) => it.status === 'pending')))
               }
             />
           )}
