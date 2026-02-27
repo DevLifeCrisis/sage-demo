@@ -376,6 +376,7 @@ SAGEConversationEngine.prototype = {
 
         var context = this._getContext(conv);
         var currentIntent = conv.getValue('intent');
+        var justSetIntent = false;
 
         // Log the choice as inbound
         var turnCount = parseInt(conv.getValue('turn_count') || '0', 10) + 1;
@@ -397,13 +398,15 @@ SAGEConversationEngine.prototype = {
             conv.setValue('intent', currentIntent);
             context.currentStep = 0;
             context.flowStarted = false;
+            justSetIntent = true;
         }
 
         var intentConfig = this._getIntentConfig(currentIntent);
 
         // Store the choice as collected data for the current step
+        // BUT skip if we just set the intent — the choice was the intent, not step data
         var flowSteps = intentConfig ? this._parseJSON(intentConfig.flow_steps) : [];
-        if (flowSteps.length > 0 && context.currentStep < flowSteps.length) {
+        if (!justSetIntent && flowSteps.length > 0 && context.currentStep < flowSteps.length) {
             var stepDef = flowSteps[context.currentStep];
             if (stepDef && stepDef.field) {
                 context.collectedData[stepDef.field] = choice;
