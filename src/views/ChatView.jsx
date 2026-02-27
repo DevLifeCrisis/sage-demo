@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MessageList from '../components/chat/MessageList';
 import ChatInput from '../components/chat/ChatInput';
@@ -100,7 +100,7 @@ export default function ChatView() {
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [conversationId, setConversationId] = useState(null);
+  const conversationIdRef = useRef(null);
 
   // Track all discovered records across the conversation
   const [records, setRecords] = useState([]);
@@ -161,12 +161,11 @@ export default function ChatView() {
 
   // Ensure we have a conversation, starting one if needed
   const ensureConversation = useCallback(async () => {
-    if (conversationId) return conversationId;
+    if (conversationIdRef.current) return conversationIdRef.current;
     const result = await startConversation();
-    const newId = result.conversationId;
-    setConversationId(newId);
-    return newId;
-  }, [conversationId]);
+    conversationIdRef.current = result.conversationId;
+    return conversationIdRef.current;
+  }, []);
 
   const handleSend = useCallback(async (text) => {
     const userMsg = { role: 'user', text, timestamp: formatTime() };
