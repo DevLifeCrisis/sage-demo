@@ -445,6 +445,11 @@
         var state = gr.getValue('state') || 'active';
         var outcome = gr.getValue('outcome') || '';
 
+        var contextStr = gr.getValue('context_data') || '{}';
+        var contextData = {};
+        try { contextData = JSON.parse(contextStr); } catch (e) { contextData = {}; }
+        var employeeName = (contextData.collectedData || {}).employee_name || '';
+
         records.push({
             sys_id: gr.getUniqueValue(),
             number: gr.getValue('number'),
@@ -456,7 +461,8 @@
             started_at: gr.getValue('started_at'),
             ended_at: gr.getValue('ended_at'),
             turn_count: parseInt(gr.getValue('turn_count') || '0', 10),
-            satisfaction: gr.getValue('satisfaction')
+            satisfaction: gr.getValue('satisfaction'),
+            employee_name: employeeName
         });
 
         summary.total++;

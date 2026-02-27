@@ -63,11 +63,11 @@ export function transformDashboardData(raw) {
 
   const orchestrationCards = records.map((r) => ({
     id: r.sys_id,
-    title: `${(r.intent || 'General').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())} — ${r.user || 'Unknown User'}`,
+    title: `${(r.intent || 'General').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())} — ${r.employee_name || r.user || 'Unknown User'}`,
     number: r.number || r.sys_id?.slice(0, 12),
     status: stateToStatus(r.state),
     type: intentToType[(r.intent || '').toLowerCase()] || 'manager',
-    assignedTo: r.user || 'Unassigned',
+    assignedTo: r.employee_name || r.user || 'Unassigned',
     priority: r.turn_count > 10 ? 'High' : r.turn_count > 5 ? 'Medium' : 'Low',
     department: (r.intent || 'General').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
     estimatedCompletion: r.ended_at
