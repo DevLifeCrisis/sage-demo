@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import MessageList from '../components/chat/MessageList';
 import ChatInput from '../components/chat/ChatInput';
 import WelcomeScreen from '../components/chat/WelcomeScreen';
-import { sendMessage as sendMessageMock, sendChoice, confirmAction } from '../services/api';
-import { sendToLLM } from '../services/llm';
+import { startConversation, sendMessage as apiSendMessage, sendChoice as apiSendChoice, sendAction as apiSendAction } from '../services/api';
+// import { sendToLLM } from '../services/llm'; // Disabled — using ServiceNow backend
 import styles from './ChatView.module.css';
 
 function formatTime() {
@@ -100,6 +100,7 @@ export default function ChatView() {
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [conversationId, setConversationId] = useState(null);
 
   // Track all discovered records across the conversation
   const [records, setRecords] = useState([]);
@@ -158,6 +159,15 @@ export default function ChatView() {
     }
   }, [processRecords]);
 
+  // Ensure we have a conversation, starting one if needed
+  const ensureConversation = useCallback(async () => {
+    if (conversationId) return conversationId;
+    const result = await startConversation();
+    const newId = result.conversationId;
+    setConversationId(newId);
+    return newId;
+  }, [conversationId]);
+
   const handleSend = useCallback(async (text) => {
     const userMsg = { role: 'user', text, timestamp: formatTime() };
     setMessages((prev) => [...prev, userMsg]);
@@ -167,23 +177,11 @@ export default function ChatView() {
     processRecords(text);
 
     try {
-      const llmResponse = await sendToLLM(text, messages);
-      if (llmResponse) {
-        const sageMsg = {
-          role: 'sage',
-          text: llmResponse,
-          timestamp: formatTime(),
-          choices: [],
-          actionCard: null,
-        };
-        setMessages((prev) => [...prev, sageMsg]);
-        processRecords(llmResponse);
-      } else {
-        const data = await sendMessageMock(text);
-        handleApiResponse(data);
-      }
+      const convId = await ensureConversation();
+      const data = await apiSendMessage(convId, text);
+      handleApiResponse(data);
     } catch (err) {
-      console.error('LLM/API error:', err);
+      console.error('API error:', err);
       setMessages((prev) => [
         ...prev,
         { role: 'sage', text: `Sorry, something went wrong: ${err.message || 'Unknown error'}. Please try again.`, timestamp: formatTime() },
@@ -191,7 +189,7 @@ export default function ChatView() {
     } finally {
       setIsTyping(false);
     }
-  }, [handleApiResponse, messages, processRecords]);
+  }, [handleApiResponse, processRecords, ensureConversation]);
 
   const handleChoiceSelect = useCallback(async (choice) => {
     const userMsg = { role: 'user', text: choice.label, timestamp: formatTime() };
@@ -208,7 +206,8 @@ export default function ChatView() {
     setIsTyping(true);
 
     try {
-      const data = await sendChoice(choice.value);
+      const convId = await ensureConversation();
+      const data = await apiSendChoice(convId, choice.value);
       handleApiResponse(data);
     } catch (err) {
       setMessages((prev) => [
@@ -223,26 +222,43 @@ export default function ChatView() {
   const handleConfirmAction = useCallback(async () => {
     setIsTyping(true);
     try {
-      const data = await confirmAction('current', true);
+      const convId = await ensureConversation();
+      // Find the latest action card in messages
+      let actionId = 'pending';
+      for (let i = messages.length - 1; i >= 0; i--) {
+        if (messages[i].actionCard?.id) {
+          actionId = messages[i].actionCard.id;
+          break;
+        }
+      }
+      const data = await apiSendAction(convId, actionId, true);
       handleApiResponse(data);
     } catch (err) {
       console.error(err);
     } finally {
       setIsTyping(false);
     }
-  }, [handleApiResponse]);
+  }, [handleApiResponse, ensureConversation, messages]);
 
   const handleCancelAction = useCallback(async () => {
     setIsTyping(true);
     try {
-      const data = await confirmAction('current', false);
+      const convId = await ensureConversation();
+      let actionId = 'pending';
+      for (let i = messages.length - 1; i >= 0; i--) {
+        if (messages[i].actionCard?.id) {
+          actionId = messages[i].actionCard.id;
+          break;
+        }
+      }
+      const data = await apiSendAction(convId, actionId, false);
       handleApiResponse(data);
     } catch (err) {
       console.error(err);
     } finally {
       setIsTyping(false);
     }
-  }, [handleApiResponse]);
+  }, [handleApiResponse, ensureConversation, messages]);
 
   return (
     <div className={styles.chatView}>
