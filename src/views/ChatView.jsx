@@ -140,18 +140,19 @@ export default function ChatView() {
     setMessages((prev) => [...prev, sageMsg]);
     processRecords(data.message);
 
-    // Also add any explicit activeRecords from the mock API
+    // Add activeRecords from ServiceNow response
     if (data.activeRecords?.length) {
       setRecords(prev => {
         const existing = new Set(prev.map(r => r.number));
         const toAdd = data.activeRecords
-          .filter(r => !existing.has(r.number))
+          .filter(r => r.id) // skip records with no id
+          .filter(r => !existing.has(r.number || r.id))
           .map(r => ({
-            number: r.number,
-            type: r.table,
-            icon: r.table.includes('HR') ? '👤' : r.table.includes('Request') ? '📋' : '✅',
-            table: r.table.toLowerCase().replace(/ /g, '_'),
-            status: r.status === 'Active' ? 'Created' : r.status,
+            number: r.number || r.id,
+            type: r.label || r.type || 'Record',
+            icon: (r.type || '').includes('hr') ? '👤' : (r.type || '').includes('incident') ? '🔧' : '📋',
+            table: r.type || 'unknown',
+            status: r.status || 'Created',
             timestamp: formatTime(),
           }));
         return [...prev, ...toAdd];
