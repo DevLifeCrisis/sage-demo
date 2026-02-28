@@ -610,3 +610,92 @@
         charts: charts
     });
 })(request, response);
+
+
+// =============================================================================
+// RESOURCE: GET /my-items
+// =============================================================================
+// Name: My Items
+// HTTP Method: GET
+// Relative path: /my-items
+// =============================================================================
+(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
+    var userId = gs.getUserID();
+    var items = [];
+    var limit = 50;
+
+    // Query incidents where caller_id = current user
+    var incGr = new GlideRecord('incident');
+    incGr.addQuery('caller_id', userId);
+    incGr.orderByDesc('sys_updated_on');
+    incGr.setLimit(limit);
+    incGr.query();
+    while (incGr.next()) {
+        items.push({
+            sys_id: incGr.getUniqueValue(),
+            number: incGr.getValue('number'),
+            type: 'incident',
+            short_description: incGr.getValue('short_description'),
+            state: incGr.getValue('state'),
+            priority: incGr.getValue('priority'),
+            created_on: incGr.getValue('sys_created_on'),
+            updated_on: incGr.getValue('sys_updated_on'),
+            table: 'incident'
+        });
+    }
+
+    // Query service requests where requested_for = current user
+    var reqGr = new GlideRecord('sc_request');
+    reqGr.addQuery('requested_for', userId);
+    reqGr.orderByDesc('sys_updated_on');
+    reqGr.setLimit(limit);
+    reqGr.query();
+    while (reqGr.next()) {
+        items.push({
+            sys_id: reqGr.getUniqueValue(),
+            number: reqGr.getValue('number'),
+            type: 'sc_request',
+            short_description: reqGr.getValue('short_description') || reqGr.getDisplayValue('request_state'),
+            state: reqGr.getValue('request_state') || reqGr.getValue('stage'),
+            priority: reqGr.getValue('priority'),
+            created_on: reqGr.getValue('sys_created_on'),
+            updated_on: reqGr.getValue('sys_updated_on'),
+            table: 'sc_request'
+        });
+    }
+
+    // Query HR cases where opened_for = current user
+    var hrGr = new GlideRecord('sn_hr_core_case');
+    hrGr.addQuery('opened_for', userId);
+    hrGr.orderByDesc('sys_updated_on');
+    hrGr.setLimit(limit);
+    hrGr.query();
+    while (hrGr.next()) {
+        items.push({
+            sys_id: hrGr.getUniqueValue(),
+            number: hrGr.getValue('number'),
+            type: 'sn_hr_core_case',
+            short_description: hrGr.getValue('short_description'),
+            state: hrGr.getValue('hr_state') || hrGr.getValue('state'),
+            priority: hrGr.getValue('priority'),
+            created_on: hrGr.getValue('sys_created_on'),
+            updated_on: hrGr.getValue('sys_updated_on'),
+            table: 'sn_hr_core_case'
+        });
+    }
+
+    // Sort all items by updated_on descending, then limit to 50
+    items.sort(function(a, b) {
+        var dateA = a.updated_on || '';
+        var dateB = b.updated_on || '';
+        if (dateA > dateB) return -1;
+        if (dateA < dateB) return 1;
+        return 0;
+    });
+    items = items.slice(0, limit);
+
+    response.setStatus(200);
+    response.setBody({
+        items: items
+    });
+})(request, response);

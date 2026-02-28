@@ -268,6 +268,18 @@ export async function getMetricsData() {
 }
 --- END MOCK --- */
 
+// =============================================================================
+// MY ITEMS ENDPOINT
+// =============================================================================
+
+/**
+ * Get current user's incidents, requests, and HR cases.
+ * @returns {Promise<{items: Array}>}
+ */
+export async function getMyItems() {
+  return sageFetch('/my-items', { method: 'GET' });
+}
+
 // Alias for backward compatibility with ChatView
 export async function confirmAction(conversationId, confirmed) {
   return sendAction(conversationId, "pending", confirmed);

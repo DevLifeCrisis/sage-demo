@@ -50,6 +50,18 @@ const NAV_ITEMS = [
     ),
   },
   {
+    path: '/app/my-items',
+    label: 'My Items',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="2" width="14" height="16" rx="2" />
+        <line x1="7" y1="7" x2="13" y2="7" />
+        <line x1="7" y1="10" x2="13" y2="10" />
+        <line x1="7" y1="13" x2="10" y2="13" />
+      </svg>
+    ),
+  },
+  {
     path: '/app/users',
     label: 'Users',
     icon: (

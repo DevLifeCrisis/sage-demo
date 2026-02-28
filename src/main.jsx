@@ -12,6 +12,7 @@ import MetricsView from './views/MetricsView';
 import SettingsView from './views/SettingsView';
 import AdminView from './views/AdminView';
 import UsersView from './views/UsersView';
+import MyItemsView from './views/MyItemsView';
 import ProtectedRoute from './components/ProtectedRoute';
 import './styles/global.css';
 
@@ -34,6 +35,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="settings" element={<SettingsView />} />
           <Route path="admin" element={<AdminView />} />
           <Route path="users" element={<UsersView />} />
+          <Route path="my-items" element={<MyItemsView />} />
         </Route>
 
         {/* Legacy redirects */}
