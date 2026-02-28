@@ -620,71 +620,80 @@
 // Relative path: /my-items
 // =============================================================================
 (function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
-    var userId = gs.getUserID();
+    var userName = gs.getUserName();
     var items = [];
     var limit = 50;
 
-    // Query incidents where caller_id = current user OR created by current user
-    var incGr = new GlideRecord('incident');
-    var incQc = incGr.addQuery('caller_id', userId);
-    incQc.addOrCondition('sys_created_by', gs.getUserName());
-    incGr.orderByDesc('sys_updated_on');
-    incGr.setLimit(limit);
-    incGr.query();
-    while (incGr.next()) {
-        items.push({
-            sys_id: incGr.getUniqueValue(),
-            number: incGr.getValue('number'),
-            type: 'incident',
-            short_description: incGr.getValue('short_description'),
-            state: incGr.getValue('state'),
-            priority: incGr.getValue('priority'),
-            created_on: incGr.getValue('sys_created_on'),
-            updated_on: incGr.getValue('sys_updated_on'),
-            table: 'incident'
-        });
+    // Query incidents created by current user
+    try {
+        var incGr = new GlideRecord('incident');
+        incGr.addQuery('sys_created_by', userName);
+        incGr.orderByDesc('sys_updated_on');
+        incGr.setLimit(limit);
+        incGr.query();
+        while (incGr.next()) {
+            items.push({
+                sys_id: incGr.getUniqueValue(),
+                number: incGr.getValue('number'),
+                type: 'incident',
+                short_description: incGr.getValue('short_description'),
+                state: incGr.getDisplayValue('state'),
+                priority: incGr.getDisplayValue('priority'),
+                created_on: incGr.getValue('sys_created_on'),
+                updated_on: incGr.getValue('sys_updated_on'),
+                table: 'incident'
+            });
+        }
+    } catch (e) {
+        gs.warn('My Items: Error querying incidents: ' + e.message);
     }
 
-    // Query service requests where requested_for = current user OR created by current user
-    var reqGr = new GlideRecord('sc_request');
-    var reqQc = reqGr.addQuery('requested_for', userId);
-    reqQc.addOrCondition('sys_created_by', gs.getUserName());
-    reqGr.orderByDesc('sys_updated_on');
-    reqGr.setLimit(limit);
-    reqGr.query();
-    while (reqGr.next()) {
-        items.push({
-            sys_id: reqGr.getUniqueValue(),
-            number: reqGr.getValue('number'),
-            type: 'sc_request',
-            short_description: reqGr.getValue('short_description') || reqGr.getDisplayValue('request_state'),
-            state: reqGr.getValue('request_state') || reqGr.getValue('stage'),
-            priority: reqGr.getValue('priority'),
-            created_on: reqGr.getValue('sys_created_on'),
-            updated_on: reqGr.getValue('sys_updated_on'),
-            table: 'sc_request'
-        });
+    // Query service requests created by current user
+    try {
+        var reqGr = new GlideRecord('sc_request');
+        reqGr.addQuery('sys_created_by', userName);
+        reqGr.orderByDesc('sys_updated_on');
+        reqGr.setLimit(limit);
+        reqGr.query();
+        while (reqGr.next()) {
+            items.push({
+                sys_id: reqGr.getUniqueValue(),
+                number: reqGr.getValue('number'),
+                type: 'sc_request',
+                short_description: reqGr.getValue('short_description') || reqGr.getDisplayValue('request_state'),
+                state: reqGr.getDisplayValue('request_state') || reqGr.getDisplayValue('stage'),
+                priority: reqGr.getDisplayValue('priority'),
+                created_on: reqGr.getValue('sys_created_on'),
+                updated_on: reqGr.getValue('sys_updated_on'),
+                table: 'sc_request'
+            });
+        }
+    } catch (e) {
+        gs.warn('My Items: Error querying requests: ' + e.message);
     }
 
-    // Query HR cases where opened_for = current user OR created by current user
-    var hrGr = new GlideRecord('sn_hr_core_case');
-    var hrQc = hrGr.addQuery('opened_for', userId);
-    hrQc.addOrCondition('sys_created_by', gs.getUserName());
-    hrGr.orderByDesc('sys_updated_on');
-    hrGr.setLimit(limit);
-    hrGr.query();
-    while (hrGr.next()) {
-        items.push({
-            sys_id: hrGr.getUniqueValue(),
-            number: hrGr.getValue('number'),
-            type: 'sn_hr_core_case',
-            short_description: hrGr.getValue('short_description'),
-            state: hrGr.getValue('hr_state') || hrGr.getValue('state'),
-            priority: hrGr.getValue('priority'),
-            created_on: hrGr.getValue('sys_created_on'),
-            updated_on: hrGr.getValue('sys_updated_on'),
-            table: 'sn_hr_core_case'
-        });
+    // Query HR cases created by current user
+    try {
+        var hrGr = new GlideRecord('sn_hr_core_case');
+        hrGr.addQuery('sys_created_by', userName);
+        hrGr.orderByDesc('sys_updated_on');
+        hrGr.setLimit(limit);
+        hrGr.query();
+        while (hrGr.next()) {
+            items.push({
+                sys_id: hrGr.getUniqueValue(),
+                number: hrGr.getValue('number'),
+                type: 'sn_hr_core_case',
+                short_description: hrGr.getValue('short_description'),
+                state: hrGr.getDisplayValue('hr_state') || hrGr.getDisplayValue('state'),
+                priority: hrGr.getDisplayValue('priority'),
+                created_on: hrGr.getValue('sys_created_on'),
+                updated_on: hrGr.getValue('sys_updated_on'),
+                table: 'sn_hr_core_case'
+            });
+        }
+    } catch (e) {
+        gs.warn('My Items: Error querying HR cases: ' + e.message);
     }
 
     // Sort all items by updated_on descending, then limit to 50
