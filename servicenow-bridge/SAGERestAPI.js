@@ -624,9 +624,10 @@
     var items = [];
     var limit = 50;
 
-    // Query incidents where caller_id = current user
+    // Query incidents where caller_id = current user OR created by current user
     var incGr = new GlideRecord('incident');
-    incGr.addQuery('caller_id', userId);
+    var incQc = incGr.addQuery('caller_id', userId);
+    incQc.addOrCondition('sys_created_by', gs.getUserName());
     incGr.orderByDesc('sys_updated_on');
     incGr.setLimit(limit);
     incGr.query();
@@ -644,9 +645,10 @@
         });
     }
 
-    // Query service requests where requested_for = current user
+    // Query service requests where requested_for = current user OR created by current user
     var reqGr = new GlideRecord('sc_request');
-    reqGr.addQuery('requested_for', userId);
+    var reqQc = reqGr.addQuery('requested_for', userId);
+    reqQc.addOrCondition('sys_created_by', gs.getUserName());
     reqGr.orderByDesc('sys_updated_on');
     reqGr.setLimit(limit);
     reqGr.query();
@@ -664,9 +666,10 @@
         });
     }
 
-    // Query HR cases where opened_for = current user
+    // Query HR cases where opened_for = current user OR created by current user
     var hrGr = new GlideRecord('sn_hr_core_case');
-    hrGr.addQuery('opened_for', userId);
+    var hrQc = hrGr.addQuery('opened_for', userId);
+    hrQc.addOrCondition('sys_created_by', gs.getUserName());
     hrGr.orderByDesc('sys_updated_on');
     hrGr.setLimit(limit);
     hrGr.query();
